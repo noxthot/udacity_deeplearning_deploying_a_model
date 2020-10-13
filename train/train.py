@@ -8,8 +8,10 @@ import pandas as pd
 import torch
 import torch.optim as optim
 import torch.utils.data
+import torch.nn as nn
 
 from model import LSTMClassifier
+
 
 def model_fn(model_dir):
     """Load the PyTorch model from the `model_dir` directory."""
@@ -42,6 +44,7 @@ def model_fn(model_dir):
     print("Done loading model.")
     return model
 
+
 def _get_train_data_loader(batch_size, training_dir):
     print("Get train data loader.")
 
@@ -68,8 +71,40 @@ def train(model, train_loader, epochs, optimizer, loss_fn, device):
     """
     
     # TODO: Paste the train() method developed in the notebook here.
+    grad_clip = 5
+    print("Training for %d epoch(s)..." % epochs)
+    
+    for epoch in range(1, epochs + 1):
+        model.train()
+        total_loss = 0
+        
+        for batch in train_loader:         
+            batch_X, batch_y = batch
+            
+            batch_X = batch_X.to(device)
+            batch_y = batch_y.to(device)
+            
+            # TODO: Complete this train method to train the model provided
+            # zero accumulated gradients
+            model.zero_grad()
 
-    pass
+            # get the output from the model
+            output = model(batch_X)
+
+            # calculate the loss and perform backprop
+            loss = loss_fn(output.squeeze(), batch_y)
+            loss.backward()
+    
+            # `clip_grad_norm` helps prevent the exploding gradient problem in LSTMs.
+            nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
+            optimizer.step()
+            
+            total_loss += loss.data.item()
+            
+        print("Epoch: {}, BCELoss: {}".format(epoch, total_loss / len(train_loader)))
+
+    # returns trained model
+    return model
 
 
 if __name__ == '__main__':

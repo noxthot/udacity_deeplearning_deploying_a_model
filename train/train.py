@@ -20,6 +20,7 @@ def model_fn(model_dir):
     # First, load the parameters used to create the model.
     model_info = {}
     model_info_path = os.path.join(model_dir, 'model_info.pth')
+    
     with open(model_info_path, 'rb') as f:
         model_info = torch.load(f)
 
@@ -36,6 +37,7 @@ def model_fn(model_dir):
 
     # Load the saved word_dict.
     word_dict_path = os.path.join(model_dir, 'word_dict.pkl')
+    
     with open(word_dict_path, 'rb') as f:
         model.word_dict = pickle.load(f)
 
@@ -70,7 +72,6 @@ def train(model, train_loader, epochs, optimizer, loss_fn, device):
     device       - Where the model and data should be loaded (gpu or cpu).
     """
     
-    # TODO: Paste the train() method developed in the notebook here.
     grad_clip = 5
     print("Training for %d epoch(s)..." % epochs)
     
@@ -84,7 +85,6 @@ def train(model, train_loader, epochs, optimizer, loss_fn, device):
             batch_X = batch_X.to(device)
             batch_y = batch_y.to(device)
             
-            # TODO: Complete this train method to train the model provided
             # zero accumulated gradients
             model.zero_grad()
 
